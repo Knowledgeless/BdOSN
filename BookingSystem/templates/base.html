@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{% endblock title %}</title>
+    
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    {% block links %}{% endblock links %}
+
+
+</head>
+<body>
+
+ 
+<nav class="container navbar navbar-expand-lg py-3 menubar">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center fw-bold fs-4 text-primary" href="/">
+      <img src="{% static 'img/maslab.png' %}" alt="MASLab" class="img-fluid" style="max-height: 50px;">
+    </a>
+
+    <!-- Title -->
+    <div class="mx-auto d-none d-lg-block">
+      <h4 class="mb-0 text-center fw-semibold title">Room Booking System</h4>
+    </div>
+
+
+
+    <!-- Auth Buttons -->
+    <div class="d-flex align-items-center">
+      {% if user.is_authenticated %}
+      {% comment %} {% block staff %}{% endblock staff %} {% endcomment %}
+        <span class="me-3 text-dark fw-semibold"> {{ user.username }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-sm px-3 rounded-pill btn-outline-danger"><span class="mt-2">Logout</span></a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-sm px-3 rounded-pill btn-outline-primary"><span class="fix">Login</span></a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+
+
+
+{% block contents %}{% endblock contents %}
+ 
+<!-- Toast Container -->
+<div id="toast-container" aria-live="polite" aria-atomic="true" class="toast-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="toast toast-{{ message.tags }} align-items-center border-0 mb-2"
+           role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4800">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ message }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                  data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-progress"></div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<footer class="footer mt-5 mb-0 py-3 text-light">
+  <div class="container text-center">
+    <p class="mb-1">
+      Made with <span class="text-warning"><i class="fa-solid fa-heart"></i></span> by <strong> <a href="https://wwww.facebook.com/nazmul.XI"> Nazmul Hossain </a> </strong>
+    </p>
+    <small class="text-muted">© MASLab 2025 — All Rights Reserved.</small>
+  </div>
+</footer>
+
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/archive.js' %}"></script>
+<script src="{% static 'js/all.min.js' %}"></script>
+{% block scripts %}{% endblock scripts %}
+
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+
+/* @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap'); */
+/* Regular */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-Regular.ttf' %}") format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Light */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-Light.ttf' %}") format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Medium */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-Medium.ttf' %}") format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* SemiBold */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-SemiBold.ttf' %}") format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Bold */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-Bold.ttf' %}") format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* ExtraBold */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-ExtraBold.ttf' %}") format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Black */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-Black.ttf' %}") format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* Italics (example: Medium Italic) */
+@font-face {
+  font-family: 'Montserrat';
+  src: url("{% static 'fonts/Montserrat-MediumItalic.ttf' %}") format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+/* Toast container */
+#toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1080;
+}
+
+/* Base toast */
+.toast {
+    position: relative;
+    overflow: hidden;
+    color: #fff; /* White text by default */
+    min-height: 70px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Close button always white */
+.toast .btn-close {
+    filter: invert(1);
+}
+
+/* Toast background colors based on message type */
+.toast-success {
+    background-color: #28a745 !important; /* Green */
+}
+
+.toast-error,
+.toast-danger {
+    background-color: #dc3545 !important; /* Red */
+}
+
+.toast-info {
+    background-color: #0dcaf0 !important; /* Blue */
+}
+
+.toast-warning {
+    background-color: #ffc107 !important; /* Yellow */
+    color: #333; /* Dark text for better contrast */
+}
+
+.toast-body {
+    font-family: "Montserrat", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Progress bar (always white) */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: white;
+    animation: toastProgressBar 4.8s linear forwards;
+    width: 100%;
+    opacity: 0.9;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Animation for progress bar */
+@keyframes toastProgressBar {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+.navbar{
+    margin: 15px 0;
+}
+
+.navbar .logo img {
+  max-height: 50px;
+  width: auto;   /* keeps aspect ratio */
+  display: block;
+}
+
+.navbar .title{
+    font-family: "Montserrat", sans-serif !important;
+    font-size: 30px;
+    font-weight: 800;
+    color: #222222;
+}
+
+input:focus, input:active, .btn-warning:focus, .btn-warning:active, .btn-danger:focus, .btn-danger:active, .btn-outline-danger:focus, .btn-outline-danger:active, .form-select:focus, .form-select:active{
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+
+.footer, .footer p {
+  font-family: "Montserrat", sans-serif;
+  color: #002447 !important;  
+  font-size: 0.95rem;
+}
+
+.footer strong {
+  color: #002447 !important;
+  transition: color 0.3s ease;
+}
+
+.footer strong:hover {
+  color: #ffc107; /* Gold hover effect */
+}
+
+.footer .text-warning{
+  color: red !important;
+}
+
+
+.fix{
+  margin-top: 4px !important;
+}

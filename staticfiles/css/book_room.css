@@ -1,0 +1,18 @@
+.room_name{
+    margin: 20px 0 40px 0 !important;
+    font-size: 30px;
+    font-weight: 600;
+    color: rgb(0, 44, 94);
+    text-transform: uppercase;
+}
+
+.archived{
+    text-decoration: none !important;
+    color: black !important;
+    outline: 0 !important;
+}
+.archived:focus, .archived:active{
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+{% block links %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock links %}
+
+{% block contents %}
+<div class="container mt-5">
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-lg border-0 overflow-hidden">
+            <div class="row g-0">
+
+                <!-- Left: Login Form -->
+                <div class="col-lg-5 p-5">
+                    <h3 class="text-center mb-4 fw-bold">Login</h3>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3 position-relative">
+                            {{ form.username }}
+                        </div>
+                        <div class="mb-3 position-relative">
+                            {{ form.password }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                    </form>
+                </div>
+
+                <!-- Right: Image -->
+                <div class="col-lg-7 d-none d-lg-block">
+                    <img src="{% static 'img/login.jpg' %}" alt="Login" class="img-fluid h-100 w-100 object-fit-cover" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}

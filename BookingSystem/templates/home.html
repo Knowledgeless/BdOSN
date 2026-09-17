@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load calendar_extras %}
+
+
+{% block title %}Booking | Home{% endblock title %}
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock links %}
+
+{% block contents %}
+    <section class="container my-2">
+    <div class="row g-3">
+        {% for room in rooms %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    
+                    <!-- Left side (Room name + capacity) -->
+                    <div>
+                        <h6 class="card-title fw-bold text-dark m-0">{{ room.name }}</h6>
+                        <p class="card-text text-muted small mt-2">
+                            <i class="fa-solid fa-user-group"></i>
+                            {{ room.capacity }} {% if room.capacity == 1 %}Person{% else %}People{% endif %} Capacity
+                        </p>
+                    </div>
+
+
+                    <!-- Right side (Button) -->
+                    <div>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'book_room' room.id %}" class="btn btn-purple rounded-pill btn-sm"><span>Book Now <i class="fa fa-arrow-right"></i></span></a>
+                        {% else %}
+                            <a href="{% url 'login' %}?next={% url 'book_room' room.id %}" class="btn btn-purple rounded-pill btn-sm"><span>Book Now <i class="fa fa-arrow-right"></i></span></a>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No rooms available.</p>
+        {% endfor %}
+    </div>
+</section>
+
+
+    
+           <!-- Booking Table -->
+            
+<div class="container my-5">
+    <div class="card shadow-sm booking-card">
+        <div class="card-body">
+
+            <!-- Month & Year Selector -->
+                        <div class="row align-items-center mb-4">
+                <!-- Title -->
+                <div class="col-12 col-lg-6 mb-2 mb-lg-0">
+                    <h5 class="title_booking fw-bold m-0 text-center text-lg-start">
+                        
+                        {% for m_num, m_name in months %}
+                            {% if m_num == selected_month %}
+                                {{ m_name }}
+                            {% endif %}
+                        {% endfor %}
+                        {{ selected_year }}
+                    </h5>
+                </div>
+
+                <!-- Filter Form -->
+                <div class="col-12 col-lg-6">
+                    <form method="get" 
+                        class="d-flex justify-content-center justify-content-lg-end align-items-center gap-2 filter_form">
+                        <select name="month" class="form-select form-select-sm month-select">
+                            {% for m_num, m_name in months %}
+                                <option value="{{ m_num }}" {% if m_num == selected_month %}selected{% endif %}>
+                                    {{ m_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <select name="year" class="form-select year-select form-select-sm">
+                            {% for y in years %}
+                                <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>
+                                    {{ y }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <button type="submit" class="btn btn-purple rounded-pill btn-sm px-3"><span>Filter</span></button>
+                    </form>
+                </div>
+        
+
+            <!-- Calendar Grid -->
+            <!-- Weekday names -->
+<div class="calendar-grid week-names mt-4 pt-3">
+    <div class="calendar-weekday">Sun</div>
+    <div class="calendar-weekday">Mon</div>
+    <div class="calendar-weekday">Tue</div>
+    <div class="calendar-weekday">Wed</div>
+    <div class="calendar-weekday">Thu</div>
+    <div class="calendar-weekday">Fri</div>
+    <div class="calendar-weekday">Sat</div>
+</div>
+
+<!-- Calendar days -->
+<div class="calendar-grid mt-2">
+    {% for blank in 1|get_month_start_blank:month_year %}
+        <div class="calendar-day empty"></div>
+    {% endfor %}
+
+    {% for day in 1|get_month_days:month_year %}
+        <div class="calendar-day {% if bookings|day_has_booking:day %}booked{% else %}available{% endif %}" 
+             data-bs-toggle="modal" data-bs-target="#dayModal{{ day }}">
+            <span class="day-number">{{ day }}</span>
+
+            <!-- Booking lines for large screens -->
+            {% with day_bookings=bookings|bookings_for_day:day %}
+                {% if day_bookings %}
+                <div class="booking-lines d-none d-lg-flex flex-column gap-1">
+                    {% for booking in day_bookings %}
+                    <div class="booking-line" style="border-left: 4px solid {{ booking.color }};">
+                        {{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Modal (works on all screens) -->
+        <div class="modal fade" id="dayModal{{ day }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title">Bookings - {{ day }}/{{ selected_month }}/{{ selected_year }}</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% with day_bookings=bookings|bookings_for_day:day %}
+                            {% if day_bookings %}
+                                <div class="booking-lines d-flex flex-column gap-2">
+                                    {% for booking in day_bookings %}
+                                        <div class="booking-line d-flex flex-column flex-sm-row align-items-sm-center p-2 rounded shadow-sm"
+                                            style="border-left: 4px solid {{ booking.color }}; margin-top: 3px !important">
+                                            
+                                            <div class="fw-bold me-2 mb-1 mb-sm-0 mt-1">
+                                                {{ booking.room.name }}:
+                                            </div>
+
+                                            <div class="text-muted me-2 mb-1 mb-sm-0 mt-1">
+                                                {{ booking.start_time|time:"h:i a" }} - {{ booking.end_time|time:"h:i a" }}
+                                            </div>
+
+                                            <div class="text-truncate mt-1">
+                                                ( {{ booking.user.username }} )
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            {% else %}
+                                <p class="text-muted mb-0">No bookings for this day.</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock contents %}

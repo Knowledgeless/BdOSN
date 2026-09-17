@@ -1,0 +1,228 @@
+/* Card design */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  border: none;
+  /* transition: transform 0.2s ease-in-out, background 0.2s ease-in-out; */
+}
+
+
+/* Room title */
+.card-title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+/* Capacity text */
+.card-text {
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Book Now Button */
+.btn-purple {
+  background: #6c63ff;
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 50px; /* fully round pill shape */
+  /* transition: background 0.2s ease-in-out; */
+}
+
+.btn-purple:hover{
+  background: #3712a6;
+  color: #fff !important;
+}
+
+.btn-purple span{
+  margin-top: 3px;
+}
+
+/* Card container */
+.booking-card {
+  border-radius: 12px;
+  border: none;
+  background: #fff;
+  /* transition: transform 0.2s ease-in-out; */
+}
+
+/* Title */
+.title_booking {
+  font-family: "Montserrat", sans-serif !important;
+  font-weight: 600;
+  font-size: 26px;
+}
+
+
+/* Filter Form */
+.filter_form select,
+.filter_form button {
+  font-family: "Montserrat", sans-serif;
+}
+
+.year-select {
+  width: 110px;
+}
+
+/* Custom purple button */
+.btn-purple {
+  background: #6c63ff;
+  color: #fff;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 5px 20px;   /* adjust padding */
+  line-height: 1.2;        /* keep text vertically centered */
+  display: inline-flex;    /* flex centers text */
+  align-items: center;     
+  justify-content: center;
+  text-align: center;
+  /* transition: background 0.2s ease-in-out; */
+}
+
+.btn-purple:hover {
+  background: #574bdb;
+  color: #fff;
+}
+
+
+/* Booking Table */
+.booking-table th {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif;
+  color: #444;
+}
+.booking-table td {
+  text-align: center;
+  font-size: 0.85rem;
+  font-family: "Montserrat", sans-serif;
+  color: #555;
+}
+.booking-table thead {
+  border-bottom: 2px solid #eee;
+}
+
+/* Responsive filter */
+@media (max-width: 576px) {
+  .filter_form {
+      flex-direction: column;
+      width: 100%;
+  }
+  .filter_form select,
+  .filter_form button {
+      width: 100%;
+  }
+}
+
+
+/* ! Calendar styles */
+/* Weekday names */
+.calendar-grid.week-names {
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+.calendar-weekday {
+    font-weight: 800;
+    text-align: center;
+    padding: 4px 0;
+    font-size: 16px;
+}
+
+/* Calendar grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    min-height: 90px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    cursor: pointer;
+    position: relative;
+    font-size: 16px;
+
+    /* Very light ash border */
+    border: 1px solid rgba(128,128,128,0.1);  /* low opacity gray */
+}
+
+/* Booking line colors */
+.booking-line.color1 { border-left: 4px solid #0d6efd; padding-left: 4px; }
+.booking-line.color2 { border-left: 4px solid #6f42c1; padding-left: 4px; }
+.booking-line.color3 { border-left: 4px solid #198754; padding-left: 4px; }
+.booking-line.color4 { border-left: 4px solid #fd7e14; padding-left: 4px; }
+.booking-line.color5 { border-left: 4px solid #dc3545; padding-left: 4px; }
+.booking-line.color6 { border-left: 4px solid #0dcaf0; padding-left: 4px; }
+
+.booking-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.booking-line {
+    flex: 1 1 auto;   /* dynamic height if needed */
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+     /* space for border line */
+}
+
+/* .booking-line small {
+    color: black;
+    font-size: 12px;
+} */
+
+
+.calendar-day.empty {
+    background: transparent;
+    cursor: default;
+}
+
+.day-number {
+  font-size: 16px;
+    font-weight: bold;
+}
+
+/* Remove dots */
+.calendar-day::after {
+    display: none;
+}
+
+/* Large screens: booked time lines */
+@media (min-width: 992px) {
+    .calendar-day.booked {
+        background: #f8f9fa !important;
+    }
+    .booking-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-top: 4px;
+    }
+    .booking-line {
+        border-left: 4px solid #6f42c1;
+        padding-left: 4px;
+    }
+    .booking-line small {
+        color: black;
+        font-size: 10px;
+    }
+}
+
+/* Small screens: booked day boxes red */
+@media (max-width: 991px) {
+    .calendar-day.booked {
+        background: #ffeeee;
+    }
+    
+}

@@ -1,0 +1,37 @@
+login-box {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+
+        .login-left {
+            padding: 40px;
+            background-color: #f8f9fa;
+        }
+
+        .login-right {
+            background-image: url("{% static 'images/login-bg.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            min-height: 100%;
+        }
+
+
+        .form-control {
+            padding-left: 2.5rem !important;
+        }
+
+        @media (max-width: 991px) {
+            .login-right {
+                display: none;
+            }
+        }
+
+
+input:focus, input:active, input:active{
+    background-color: transparent !important;
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}

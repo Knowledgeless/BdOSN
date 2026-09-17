@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Booking{% endblock title %}
+
+{% block contents %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="h4 mb-4">Edit booking</h1>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-flex gap-2 justify-content-end mt-4">
+                            <a href="{% url 'book_room' booking.room.id %}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock contents %}
