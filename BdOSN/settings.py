@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from urllib.parse import urlparse
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
@@ -98,8 +99,17 @@ WSGI_APPLICATION = 'BdOSN.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 database_url = os.environ.get("DATABASE_URL")
-placeholder_values = ("user", "password", "host", "database")
-if database_url and any(value in database_url for value in placeholder_values):
+if database_url:
+    parsed_database_url = urlparse(database_url)
+    has_placeholder = (
+        parsed_database_url.username == "user"
+        or parsed_database_url.password == "password"
+        or parsed_database_url.hostname == "host"
+        or parsed_database_url.path.lstrip("/") == "database"
+    )
+else:
+    has_placeholder = False
+if has_placeholder:
     raise ImproperlyConfigured(
         "DATABASE_URL still contains example placeholder values. Set it to the real PostgreSQL URL from your database provider."
     )
