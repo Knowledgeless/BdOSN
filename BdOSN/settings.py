@@ -21,6 +21,10 @@ def env_flag(name, default=False):
     return os.environ.get(name, str(default)).lower() in {"1", "true", "yes", "on"}
 
 
+def env_list(name):
+    return [value.strip() for value in os.environ.get(name, "").split(",") if value.strip()]
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,28 +33,39 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+# `development` is the default for local runs. Set `DJANGO_ENV=production`
+# on any deployment platform, including Vercel.
+DJANGO_ENV = os.environ.get("DJANGO_ENV", "development").lower()
+IS_PRODUCTION = DJANGO_ENV == "production" or env_flag("VERCEL")
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "local-development-only-key-please-set-DJANGO_SECRET_KEY-in-production-7f3b2c9a1d6e4b8f",
-)
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if IS_PRODUCTION:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production.")
+    SECRET_KEY = "local-development-only-key-change-me"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_flag("DJANGO_DEBUG")
-# DEBUG = True
+DEBUG = env_flag("DJANGO_DEBUG", default=not IS_PRODUCTION)
+if IS_PRODUCTION and DEBUG:
+    raise ImproperlyConfigured("DJANGO_DEBUG must be False in production.")
 
-vercel_host = os.environ.get("VERCEL_URL")
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-    if host.strip()
-]
-if vercel_host:
-    ALLOWED_HOSTS.append(vercel_host.split(":", 1)[0])
-if os.environ.get("VERCEL"):
+vercel_hosts = []
+for variable in ("VERCEL_URL", "VERCEL_BRANCH_URL", "VERCEL_PROJECT_PRODUCTION_URL"):
+    host = os.environ.get(variable, "").split(":", 1)[0].strip()
+    if host:
+        vercel_hosts.append(host)
+
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS")
+if not ALLOWED_HOSTS and not IS_PRODUCTION:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+for host in vercel_hosts:
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+if env_flag("VERCEL") and ".vercel.app" not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(".vercel.app")
-
-# ALLOWED_HOSTS = []
+if IS_PRODUCTION and not ALLOWED_HOSTS:
+    raise ImproperlyConfigured("DJANGO_ALLOWED_HOSTS must be set in production.")
 
 # Application definition
 
@@ -98,46 +113,61 @@ WSGI_APPLICATION = 'BdOSN.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-database_url = os.environ.get("DATABASE_URL")
-if database_url:
-    parsed_database_url = urlparse(database_url)
-    has_placeholder = (
-        parsed_database_url.username == "user"
-        or parsed_database_url.password == "password"
-        or parsed_database_url.hostname == "host"
-        or parsed_database_url.path.lstrip("/") == "database"
-    )
-else:
-    has_placeholder = False
-if has_placeholder:
-    raise ImproperlyConfigured(
-        "DATABASE_URL still contains example placeholder values. Set it to the real PostgreSQL URL from your database provider."
-    )
-if os.environ.get("VERCEL") and not database_url:
-    raise ImproperlyConfigured(
-        "DATABASE_URL must be configured on Vercel; SQLite is not persistent in serverless functions."
-    )
-if database_url:
-    database_config = dj_database_url.parse(
-        database_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=not DEBUG,
-    )
-    if os.environ.get("VERCEL") and database_config["ENGINE"] == "django.db.backends.sqlite3":
-        raise ImproperlyConfigured(
-            "A persistent PostgreSQL DATABASE_URL is required on Vercel; SQLite is not supported."
-        )
-    DATABASES = {
-        "default": database_config
+# database_url = os.environ.get("DATABASE_URL")
+# if database_url:
+#     parsed_database_url = urlparse(database_url)
+#     has_placeholder = (
+#         parsed_database_url.username == "user"
+#         or parsed_database_url.password == "password"
+#         or parsed_database_url.hostname == "host"
+#         or parsed_database_url.path.lstrip("/") == "database"
+#     )
+# else:
+#     has_placeholder = False
+# if has_placeholder:
+#     raise ImproperlyConfigured(
+#         "DATABASE_URL still contains example placeholder values. Set it to the real PostgreSQL URL from your database provider."
+#     )
+# if IS_PRODUCTION and not database_url:
+#     raise ImproperlyConfigured(
+#         "DATABASE_URL must be configured in production; SQLite is not suitable for deployment."
+#     )
+# if database_url:
+#     database_config = dj_database_url.parse(
+#         database_url,
+#         conn_max_age=0 if IS_PRODUCTION else 600,
+#         conn_health_checks=True,
+#         ssl_require=not DEBUG,
+#     )
+#     if IS_PRODUCTION and database_config["ENGINE"] == "django.db.backends.sqlite3":
+#         raise ImproperlyConfigured(
+#             "A PostgreSQL DATABASE_URL is required in production; SQLite is not supported."
+#         )
+#     DATABASES = {
+#         "default": database_config
+#     }
+# else:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": BASE_DIR / "db.sqlite3",
+#         }
+#     }
+
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "railway",
+        "USER": "postgres",
+        "PASSWORD": "RjHZwfvdxRFHUipVFVwCRpeFQnLzdSTj",
+        "HOST": "hopper.proxy.rlwy.net",
+        "PORT": "36346",
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
+
+
+
 
 
 # Password validation
@@ -205,11 +235,8 @@ SECURE_HSTS_PRELOAD = not DEBUG
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 X_FRAME_OPTIONS = "DENY"
 
-csrf_origins = [
-    origin.strip()
-    for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
-    if origin.strip()
-]
-if vercel_host:
-    csrf_origins.append(f"https://{vercel_host.split(':', 1)[0]}")
-CSRF_TRUSTED_ORIGINS = csrf_origins
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
+for host in vercel_hosts:
+    origin = f"https://{host}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
