@@ -149,7 +149,7 @@ fonttools==4.62.1
 fqdn==1.5.1
 frozenlist==1.8.0
 fs==2.4.16
-GDAL @ file:///build/reproducible-path/gdal-3.13.3%2Bdfsg/build-py3.14/swig/python
+# GDAL @ file:///build/reproducible-path/gdal-3.13.3%2Bdfsg/build-py3.14/swig/python
 gevent==25.9.1
 gevent-websocket==0.10.1
 ghp-import==2.1.0
