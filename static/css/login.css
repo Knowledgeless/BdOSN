@@ -11,7 +11,7 @@ login-box {
         }
 
         .login-right {
-            background-image: url("{% static 'images/login-bg.jpg' %}");
+            background-image: url("../img/login.jpg");
             background-size: cover;
             background-position: center;
             min-height: 100%;
