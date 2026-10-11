@@ -11,8 +11,8 @@ urlpatterns = [
     path('booking/<int:booking_id>/edit/', views.edit_booking, name='edit_booking'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    # path("rooms/<int:room_id>/archived/filter/", views.filter_archived_bookings, name="filter_archived_bookings"),
     path('rooms/<int:room_id>/archived/filter/', views.filter_archived_bookings, name='filter_archived'),
+    path('cron/archive-expired-bookings/', views.archive_expired_bookings_cron, name='archive_expired_bookings_cron'),
 
 
 ]

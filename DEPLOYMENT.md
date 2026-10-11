@@ -21,8 +21,11 @@ Set these environment variables for **Production**, **Preview**, and **Developme
 - `DJANGO_ALLOWED_HOSTS`: your custom domain, without `https://` (the default `*.vercel.app` host is already allowed)
 - `DJANGO_CSRF_TRUSTED_ORIGINS`: your full HTTPS origin, such as `https://booking.example.com`
 - `DJANGO_DEBUG`: `False`
+- `CRON_SECRET`: a long random value used to authenticate the scheduled archive job
 
 Deploy from the repository root. Vercel runs `build.sh`, which collects static files, and `api/index.py` serves the Django WSGI application.
+
+Vercel Cron calls `/cron/archive-expired-bookings/` daily at 00:00 UTC. The endpoint archives bookings whose date is before the application's local date, then deletes those active booking records. Configure `CRON_SECRET` in each Vercel environment where the job should run, and redeploy after adding it. The cron schedule requires a Vercel plan that supports daily cron jobs.
 
 You can add the database URL with the Vercel CLI, or add it in the Vercel dashboard:
 

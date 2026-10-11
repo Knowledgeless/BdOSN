@@ -201,7 +201,7 @@
                     <div class="row g-2 mb-3">
                         <div class="col-md-5"><input type="date" id="fromDate" class="form-control"></div>
                         <div class="col-md-5"><input type="date" id="toDate" class="form-control"></div>
-                        <div class="col-md-2 "><button class="btn btn-warning w-100" id="filterArchived">Filter</button></div>
+                        <div class="col-md-2 "><button class="btn btn-warning w-100" id="filterArchived" data-url="{% url 'filter_archived' room.id %}">Filter</button></div>
                     </div>
                     <div id="archivedResults">
                         <p class="text-muted">Select a date range to view archived bookings.</p>

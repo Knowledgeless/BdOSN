@@ -9,7 +9,10 @@ from django.contrib.auth import login, logout
 from django.views.decorators.http import require_GET
 from calendar import monthrange, month_name
 from django.utils.timezone import localdate
+from django.db import transaction
 import calendar
+import hmac
+import os
 
 ORGANIZATIONS = [
     "SPSB", "BdMSO", "BdOSN", "WROBd", "IROC",
@@ -246,7 +249,7 @@ def filter_archived_bookings(request, room_id):
     data = [
         {
             "title": b.title,
-            "user": b.user.get_full_name() or b.user.username,
+            "user": (b.user.get_full_name() or b.user.username) if b.user else "Unknown user",
             "date": b.conference_date.strftime("%Y-%m-%d"),
             "start": b.start_time.strftime("%H:%M"),
             "end": b.end_time.strftime("%H:%M"),
@@ -261,21 +264,43 @@ def filter_archived_bookings(request, room_id):
 
 def archive_expired_bookings():
     today = localdate()
-    expired_bookings = Booking.objects.filter(conference_date__lt=today)
+    archived_count = 0
 
-    for booking in expired_bookings:
-        ArchivedBooking.objects.create(
-            original_booking_id=booking.id,
-            user=booking.user,
-            room=booking.room,
-            title=booking.title,
-            conference_date=booking.conference_date,
-            start_time=booking.start_time,
-            end_time=booking.end_time,
-            organization=booking.organization,
-            booked_for=booking.booked_for,
-            additional_support=booking.additional_support,
-        )
-        booking.delete()
+    with transaction.atomic():
+        expired_bookings = Booking.objects.select_for_update().filter(
+            conference_date__lt=today
+        ).select_related("user", "room")
+
+        for booking in expired_bookings:
+            ArchivedBooking.objects.create(
+                original_booking_id=booking.id,
+                user=booking.user,
+                room=booking.room,
+                title=booking.title,
+                conference_date=booking.conference_date,
+                start_time=booking.start_time,
+                end_time=booking.end_time,
+                organization=booking.organization,
+                booked_for=booking.booked_for,
+                additional_support=booking.additional_support,
+            )
+            booking.delete()
+            archived_count += 1
+
+    return archived_count
+
+
+@require_GET
+def archive_expired_bookings_cron(request):
+    secret = os.environ.get("CRON_SECRET")
+    if not secret:
+        return JsonResponse({"error": "Cron authentication is not configured"}, status=503)
+
+    authorization = request.headers.get("Authorization", "")
+    if not hmac.compare_digest(authorization, f"Bearer {secret}"):
+        return JsonResponse({"error": "Unauthorized"}, status=403)
+
+    archived_count = archive_expired_bookings()
+    return JsonResponse({"archived": archived_count})
 
 

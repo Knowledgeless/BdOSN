@@ -41,67 +41,52 @@ document.addEventListener("DOMContentLoaded", () => {
     filterBtn.addEventListener("click", () => {
         const from = document.getElementById("fromDate").value;
         const to = document.getElementById("toDate").value;
-        const roomId = filterBtn.dataset.roomId; // pass room id via data attribute
+        resultsDiv.textContent = "Loading...";
 
-        if (!roomId) {
-            resultsDiv.innerHTML = `<p class="text-danger">Room ID not found.</p>`;
-            return;
-        }
+        const url = new URL(filterBtn.dataset.url, window.location.origin);
+        if (from) url.searchParams.set("from", from);
+        if (to) url.searchParams.set("to", to);
 
-        resultsDiv.innerHTML = `<p class="text-muted">Loading...</p>`;
-
-        fetch(`/filter_archived/${roomId}/?from=${from}&to=${to}`)
+        fetch(url)
             .then(res => res.json().then(data => ({ status: res.status, body: data })))
             .then(obj => {
                 const status = obj.status;
                 const data = obj.body;
 
                 if (status !== 200) {
-                    resultsDiv.innerHTML = `<p class="text-danger">${data.error || 'Unknown error occurred'}</p>`;
+                    resultsDiv.textContent = data.error || "Error loading data.";
                     return;
                 }
 
                 if (!data.bookings || data.bookings.length === 0) {
-                    resultsDiv.innerHTML = `<p class="text-muted">No archived bookings found in this range.</p>`;
+                    resultsDiv.textContent = "No archived bookings found in this range.";
                     return;
                 }
 
-                let table = `
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Title</th>
-                                <th>Booked By</th>
-                                <th>Date</th>
-                                <th>Start</th>
-                                <th>End</th>
-                                <th>Organization</th>
-                                <th>Booked For</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
+                const wrapper = document.createElement("div");
+                wrapper.className = "table-responsive";
+                const table = document.createElement("table");
+                table.className = "table table-striped table-bordered align-middle";
+                table.innerHTML = "<thead class=\"table-light\"><tr><th>Title</th><th>Booked By</th><th>Date</th><th>Start</th><th>End</th><th>Organization</th><th>Booked For</th><th>Notes</th></tr></thead>";
+                const tbody = document.createElement("tbody");
 
-                data.bookings.forEach(b => {
-                    table += `
-                        <tr>
-                            <td>${b.title}</td>
-                            <td>${b.user}</td>
-                            <td>${b.date}</td>
-                            <td>${b.start}</td>
-                            <td>${b.end}</td>
-                            <td>${b.organization}</td>
-                            <td>${b.booked_for}</td>
-                            <td>${b.notes || 'N/A'}</td>
-                        </tr>`;
+                data.bookings.forEach(booking => {
+                    const row = document.createElement("tr");
+                    [booking.title, booking.user, booking.date, booking.start, booking.end,
+                        booking.organization, booking.booked_for, booking.notes || "N/A"].forEach(value => {
+                            const cell = document.createElement("td");
+                            cell.textContent = value;
+                            row.appendChild(cell);
+                        });
+                    tbody.appendChild(row);
                 });
 
-                table += `</tbody></table></div>`;
-                resultsDiv.innerHTML = table;
+                table.appendChild(tbody);
+                wrapper.appendChild(table);
+                resultsDiv.replaceChildren(wrapper);
             })
-            .catch(err => {
-                resultsDiv.innerHTML = `<p class="text-danger">Error loading data: ${err}</p>`;
+            .catch(() => {
+                resultsDiv.textContent = "Error loading data.";
             });
     });
 });
