@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
-from datetime import datetime, date, time as dt_time
+from datetime import datetime, date, time as dt_time, timedelta
 from .models import Room, Booking, ArchivedBooking
 from .forms import BookingForm, CustomLoginForm
 from django.contrib import messages
@@ -21,11 +21,35 @@ ORGANIZATIONS = [
 
 BOOKING_COLORS = ['#fd7e14', "#842bff", '#0dcaf0', '#dc3545','#0d6efd', '#198754',]
 
+
+def has_booking_conflict(room, booking_date, start_time, end_time, exclude_id=None):
+    existing_bookings = Booking.objects.filter(room=room, conference_date=booking_date)
+    if exclude_id:
+        existing_bookings = existing_bookings.exclude(id=exclude_id)
+
+    proposed_start = datetime.combine(booking_date, start_time)
+    proposed_end = datetime.combine(booking_date, end_time)
+    min_gap = timedelta(hours=1)
+
+    for booking in existing_bookings:
+        existing_start = datetime.combine(booking_date, booking.start_time)
+        existing_end = datetime.combine(booking_date, booking.end_time)
+        if proposed_start < existing_end + min_gap and proposed_end > existing_start - min_gap:
+            return True
+
+    return False
+
+
 def home(request):
     rooms = Room.objects.all()
     today = datetime.today()
     month = int(request.GET.get('month', today.month))
     year = int(request.GET.get('year', today.year))
+
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year if month > 1 else year - 1
+    next_month = month + 1 if month < 12 else 1
+    next_year = year if month < 12 else year + 1
 
     start_date = date(year, month, 1)
     end_date = date(year, month, monthrange(year, month)[1])
@@ -54,9 +78,13 @@ def home(request):
     context = {
         'rooms': rooms,
         'bookings': bookings,
-        'bookings_by_day': bookings_by_day,  # ✅ pass grouped bookings with colors
+        'bookings_by_day': bookings_by_day,
         'selected_month': month,
         'selected_year': year,
+        'prev_month': prev_month,
+        'prev_year': prev_year,
+        'next_month': next_month,
+        'next_year': next_year,
         'months': months,
         'years': range(today.year, today.year + 3),
         'month_year': (month, year),
@@ -110,15 +138,8 @@ def book_room(request, room_id):
                 messages.error(request, f"Invalid date {booking_date} (slot #{idx}): cannot book past dates.")
                 continue
 
-            clash_exists = Booking.objects.filter(
-                room=room,
-                conference_date=booking_date,
-                start_time__lt=end,
-                end_time__gt=start
-            ).exists()
-
-            if clash_exists:
-                messages.error(request, f"Time clash on {booking_date} (slot #{idx}) {s}-{e}.")
+            if has_booking_conflict(room, booking_date, start, end):
+                messages.error(request, f"Bookings must have a 1-hour gap. Please choose a slot starting at or after {datetime.combine(booking_date, end) + timedelta(hours=1):%H:%M} on {booking_date}.")
                 continue
 
             Booking.objects.create(
@@ -176,15 +197,14 @@ def edit_booking(request, booking_id):
             elif updated_booking.start_time >= updated_booking.end_time:
                 messages.error(request, "End time must be after start time.")
             else:
-                conflict = Booking.objects.filter(
-                    room=updated_booking.room,
-                    conference_date=updated_booking.conference_date
-                ).exclude(id=updated_booking.id).filter(
-                    start_time__lt=updated_booking.end_time,
-                    end_time__gt=updated_booking.start_time
-                )
-                if conflict.exists():
-                    messages.error(request, "This time slot is already booked.")
+                if has_booking_conflict(
+                    updated_booking.room,
+                    updated_booking.conference_date,
+                    updated_booking.start_time,
+                    updated_booking.end_time,
+                    exclude_id=updated_booking.id,
+                ):
+                    messages.error(request, "This booking conflicts with an existing slot or violates the required 1-hour gap.")
                 else:
                     updated_booking.save()
                     messages.success(request, "Booking updated successfully.")

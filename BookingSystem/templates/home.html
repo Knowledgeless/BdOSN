@@ -57,22 +57,29 @@
                         <div class="row align-items-center mb-4">
                 <!-- Title -->
                 <div class="col-12 col-lg-6 mb-2 mb-lg-0">
-                    <h5 class="title_booking fw-bold m-0 text-center text-lg-start">
-                        
-                        {% for m_num, m_name in months %}
-                            {% if m_num == selected_month %}
-                                {{ m_name }}
-                            {% endif %}
-                        {% endfor %}
-                        {{ selected_year }}
-                    </h5>
+                    <div class="calendar-header d-flex align-items-center justify-content-center justify-content-lg-start gap-2">
+                        <a href="?month={{ prev_month }}&year={{ prev_year }}" class="calendar-nav-btn" aria-label="Previous month">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                        <h5 class="title_booking fw-bold m-0 text-center text-lg-start">
+                            {% for m_num, m_name in months %}
+                                {% if m_num == selected_month %}
+                                    {{ m_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {{ selected_year }}
+                        </h5>
+                        <a href="?month={{ next_month }}&year={{ next_year }}" class="calendar-nav-btn" aria-label="Next month">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Filter Form -->
                 <div class="col-12 col-lg-6">
                     <form method="get" 
                         class="d-flex justify-content-center justify-content-lg-end align-items-center gap-2 filter_form">
-                        <select name="month" class="form-select form-select-sm month-select">
+                        <select name="month" class="form-select form-select-sm month-select modern-select">
                             {% for m_num, m_name in months %}
                                 <option value="{{ m_num }}" {% if m_num == selected_month %}selected{% endif %}>
                                     {{ m_name }}
@@ -80,7 +87,7 @@
                             {% endfor %}
                         </select>
 
-                        <select name="year" class="form-select year-select form-select-sm">
+                        <select name="year" class="form-select year-select form-select-sm modern-select">
                             {% for y in years %}
                                 <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>
                                     {{ y }}

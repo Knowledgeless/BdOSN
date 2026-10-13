@@ -68,3 +68,31 @@ class BookingArchiveTests(TestCase):
 		}):
 			page = self.client.get(f"/book/{self.room.pk}/")
 		self.assertContains(page, f'data-url="/rooms/{self.room.pk}/archived/filter/"')
+
+	def test_booking_requires_one_hour_gap_after_previous_booking(self):
+		today = localdate()
+		user = get_user_model().objects.create_user(username="alice")
+		self.client.force_login(user)
+		Booking.objects.create(
+			room=self.room,
+			user=user,
+			title="Existing meeting",
+			conference_date=today,
+			start_time="15:00",
+			end_time="16:00",
+		)
+
+		response = self.client.post(
+			f"/book/{self.room.pk}/",
+			{
+				"title": "Later meeting",
+				"conference_date[]": [today.isoformat()],
+				"start_time[]": ["16:30"],
+				"end_time[]": ["17:30"],
+				"organization": "BdOSN",
+				"booked_for": "Alice",
+			},
+		)
+
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(Booking.objects.filter(room=self.room, conference_date=today).count(), 1)

@@ -1,6 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const toastEls = document.querySelectorAll('.toast');
+    toastEls.forEach(function (toastEl) {
+        if (toastEl.dataset.bootstrapInit === 'true') return;
+
+        const toast = new bootstrap.Toast(toastEl, {
+            delay: 4800,
+            autohide: true,
+        });
+
+        toast.show();
+        toastEl.dataset.bootstrapInit = 'true';
+    });
+
+    document.querySelectorAll('.booking-time-input').forEach(function (timeInput) {
+        if (!timeInput.placeholder) {
+            timeInput.placeholder = timeInput.name.includes('start') ? 'Start Time' : 'End Time';
+        }
+    });
+
     const addSlotBtn = document.getElementById("addSlot");
     const slotsContainer = document.getElementById("booking-slots");
+
+    if (!addSlotBtn || !slotsContainer) return;
 
     addSlotBtn.addEventListener("click", function () {
         const newSlot = document.createElement("div");
@@ -10,11 +31,13 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="mb-2">
                 <input type="date" name="conference_date[]" class="form-control" required>
             </div>
-            <div class="d-flex mb-2">
-                <input type="time" name="start_time[]" class="form-control" required>
+            <div class="mb-2">
+                <label class="form-label small text-muted mb-1">Start Time</label>
+                <input type="time" name="start_time[]" class="form-control booking-time-input" placeholder="Start Time" required>
             </div>
-            <div class="d-flex mb-2">
-                <input type="time" name="end_time[]" class="form-control" required>
+            <div class="mb-2">
+                <label class="form-label small text-muted mb-1">End Time</label>
+                <input type="time" name="end_time[]" class="form-control booking-time-input" placeholder="End Time" required>
             </div>
             <div class="text-end">
                 <button type="button" class="btn btn-outline-danger btn-sm remove-slot">
@@ -25,14 +48,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         slotsContainer.appendChild(newSlot);
 
-        // remove handler
         newSlot.querySelector(".remove-slot").addEventListener("click", function () {
             newSlot.remove();
         });
     });
-});
 
-document.addEventListener("DOMContentLoaded", () => {
     const filterBtn = document.getElementById("filterArchived");
     const resultsDiv = document.getElementById("archivedResults");
 
@@ -90,42 +110,3 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 });
-
-
-
-// fetch(url)
-// .then(res => res.json().then(data => ({status: res.status, body: data})))
-// .then(obj => {
-//     const resStatus = obj.status;
-//     const data = obj.body;
-
-//     if (resStatus !== 200) {
-//         resultsDiv.innerHTML = `<p class="text-danger">${data.error || 'Unknown error'}</p>`;
-//         return;
-//     }
-
-//     if (!data.bookings || data.bookings.length === 0) {
-//         resultsDiv.innerHTML = `<p class="text-muted">No archived bookings found in this range.</p>`;
-//         return;
-//     }
-
-//     let table = `<div class="table-responsive">
-//         <table class="table table-striped table-bordered align-middle">
-//         <thead class="table-light">
-//             <tr>
-//                 <th>Title</th><th>Booked By</th><th>Date</th>
-//                 <th>Start</th><th>End</th><th>Notes</th>
-//             </tr>
-//         </thead><tbody>`;
-
-//     data.bookings.forEach(b => {
-//         table += `<tr>
-//             <td>${b.title}</td><td>${b.user}</td><td>${b.date}</td>
-//             <td>${b.start}</td><td>${b.end}</td><td>${b.notes || "N/A"}</td>
-//         </tr>`;
-//     });
-
-//     table += "</tbody></table></div>";
-//     resultsDiv.innerHTML = table;
-// })
-// .catch(err => resultsDiv.innerHTML = `<p class="text-danger">Error loading data: ${err}</p>`);
