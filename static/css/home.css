@@ -17,16 +17,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f3f0ff, #e8ecff);
+  /* background: linear-gradient(135deg, #f3f0ff, #e8ecff); */
   color: #4338ca;
-  border: 1px solid rgba(67, 56, 202, 0.14);
+  /* border: 1px solid rgba(67, 56, 202, 0.14); */
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .calendar-nav-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(67, 56, 202, 0.12);
+  /* box-shadow: 0 8px 18px rgba(67, 56, 202, 0.12); */
   color: #4338ca;
 }
 
@@ -125,6 +125,33 @@
   background-color: #fff;
   color: #1f2937;
 }
+
+
+
+.modern-select:focus, .form-control:focus, .form-select:focus {
+  outline: none !important;
+  border-color: 0 !important;
+  box-shadow: none !important;
+  background-color: #fff;
+  color: #000;
+}
+
+.form-select {
+  outline: none !important;
+  border-color: 0 !important;
+  box-shadow: none !important;
+  background-color: #fff;
+  color: #000;
+}
+
+select option:hover {
+  outline: none !important;
+  border-color: 0 !important;
+  box-shadow: none !important;
+  background-color: #6c63ff !important;
+  color: #fff !important;
+}
+
 
 /* Custom purple button */
 .btn-purple {
