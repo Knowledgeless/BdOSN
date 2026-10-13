@@ -20,7 +20,7 @@ ORGANIZATIONS = [
     "Malala Project", "BdMO", "Other",
 ]
 
-BOOKING_COLORS = ['#fd7e14', "#842bff", '#0dcaf0', '#dc3545','#0d6efd', '#198754', "#6D1987"]
+BOOKING_COLORS = ['#fd7e14', "#6442ff", '#0dcaf0', '#dc3545','#0d6efd', "#56EA00", "#C300FF"]
 
 
 def has_booking_conflict(room, booking_date, start_time, end_time, exclude_id=None):
@@ -71,9 +71,9 @@ def home(request):
 
     # Assign colors independently per day in a random order so the first booking does not keep the same color
     for day, day_bookings in bookings_by_day.items():
-        random.shuffle(day_bookings)
-        for i, booking in enumerate(day_bookings):
-            booking.color = BOOKING_COLORS[i % len(BOOKING_COLORS)]
+        for booking in day_bookings:
+            booking.color = random.choice(BOOKING_COLORS)
+            print("Booking:", booking.title, "Color:", booking.color)
 
     months = [(i, month_name[i]) for i in range(1, 13)]
 
