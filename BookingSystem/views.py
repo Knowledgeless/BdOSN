@@ -13,13 +13,14 @@ from django.db import transaction
 import calendar
 import hmac
 import os
+import random
 
 ORGANIZATIONS = [
     "SPSB", "BdMSO", "BdOSN", "WROBd", "IROC",
     "Malala Project", "BdMO", "Other",
 ]
 
-BOOKING_COLORS = ['#fd7e14', "#842bff", '#0dcaf0', '#dc3545','#0d6efd', '#198754',]
+BOOKING_COLORS = ['#fd7e14', "#842bff", '#0dcaf0', '#dc3545','#0d6efd', '#198754', "#6D1987"]
 
 
 def has_booking_conflict(room, booking_date, start_time, end_time, exclude_id=None):
@@ -68,8 +69,9 @@ def home(request):
             bookings_by_day[day] = []
         bookings_by_day[day].append(booking)
 
-    # Assign colors independently per day
+    # Assign colors independently per day in a random order so the first booking does not keep the same color
     for day, day_bookings in bookings_by_day.items():
+        random.shuffle(day_bookings)
         for i, booking in enumerate(day_bookings):
             booking.color = BOOKING_COLORS[i % len(BOOKING_COLORS)]
 
