@@ -77,7 +77,7 @@ def archive_expired_bookings():
         #
         expired_bookings = (
             Booking.objects
-            .select_for_update()
+            .select_for_update(of=("self",))
             .select_related("user", "room")
             .filter(
                 conference_date__lte=current_date
